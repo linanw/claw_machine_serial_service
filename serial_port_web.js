@@ -41,6 +41,31 @@ app.get('/close', function (req, res) {
   res.end();
 });
 
+app.get('/up', function (req, res) {
+  //TODO: to be implemented
+  res.end();
+});
+app.get('/down', function (req, res) {
+  //TODO: to be implemented
+  res.end();
+});
+app.get('/left', function (req, res) {
+  //TODO: to be implemented
+  res.end();
+});
+app.get('/right', function (req, res) {
+  //TODO: to be implemented
+  res.end();
+});
+app.get('/start', function (req, res) {
+  //TODO: to be implemented
+  res.end();
+});
+app.get('/catch', function (req, res) {
+  //TODO: to be implemented
+  res.end();
+});
+
 io.on('connection', onConnection);
 
 var connectedSocket = null;

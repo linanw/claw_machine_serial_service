@@ -6,15 +6,15 @@ hosted web video sdk 1:1 chat ---> video SDK ---> web-serial (this application) 
 
 the communication from this appication to claw machine motherboar is via gcode
 
-here are some web services which are exposed to (video SDK)
-- up
-- down
-- left
-- right
-- start
+here are some web services which are exposed to (video SDK) within serial_port_web.js
+- app.get('/up'......
+- app.get('/down'....
+- app.get('/left'....
+- app.get('/right'....
+- app.get('/start'....
   - this should start playing music
     - there should be a list of music, good selection too
-- catch
+- app.get('/catch'....
   - this will have a fairly more complex gcode, as it will need to
     - drop the claw
     - retrieve back the claw
