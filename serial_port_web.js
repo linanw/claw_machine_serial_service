@@ -43,26 +43,57 @@ app.get('/close', function (req, res) {
 
 app.get('/up', function (req, res) {
   //TODO: to be implemented
+  console.log("up");
+  SerialPort.write("[$J=G91 G21 Y-100 F800]");
   res.end();
 });
 app.get('/down', function (req, res) {
   //TODO: to be implemented
+  console.log("down");
+  SerialPort.write("[$J=G91 G21 Y+100 F800]");
   res.end();
 });
 app.get('/left', function (req, res) {
   //TODO: to be implemented
+  console.log("left");
+  SerialPort.write("[$J=G91 G21 X-100 F800]");
   res.end();
 });
 app.get('/right', function (req, res) {
   //TODO: to be implemented
+  console.log("right");
+  SerialPort.write("[$J=G91 G21 X+100 F800]");
   res.end();
 });
 app.get('/start', function (req, res) {
   //TODO: to be implemented
+  console.log("start");
   res.end();
 });
 app.get('/catch', function (req, res) {
   //TODO: to be implemented
+  console.log("catch");
+
+
+
+
+  //drop down claw
+  SerialPort.write("[$J=G91 G21 Z+200 F1000]");
+  
+  //close claw
+  SerialPort.write("[M8]");
+
+  //move up claw
+  SerialPort.write("[$J=G91 G21 Z+200 F1000]");
+
+  //goto origin left
+  SerialPort.write("[$J=G91 G21 X-1000 F800]");
+
+  //goto origin down
+  SerialPort.write("[$J=G91 G21 Y-1000 F800]");
+
+  //open claw
+  SerialPort.write("[M9]");
   res.end();
 });
 
@@ -92,20 +123,24 @@ SerialPort.list().then(ports => {
   });
   if (serports.length == 0) {
     console.log("No serial ports found!");
-    process.exit();
+    //dreamtcs to uncomment this in production
+    
+    //process.exit();
   }
-  serport = new SerialPort({
-    path: serports[0], baudRate: rate, autoOpen: false,
-  })
-  serport.on('error', function (err) {
-    console.log('Error: ', err.message)
-  })
-  serport.on('data', function (data) {
-    console.log(data.toString('utf8'));
-    io.emit('data', { data: data.toString('utf8') });
-  })
-  serport.on('close', function () {
-    console.log("port closed");
-    io.emit('close');
-  })
+  //dreamtcs to uncomment this in production
+
+  // serport = new SerialPort({
+  //   path: serports[0], baudRate: rate, autoOpen: false,
+  // })
+  // serport.on('error', function (err) {
+  //   console.log('Error: ', err.message)
+  // })
+  // serport.on('data', function (data) {
+  //   console.log(data.toString('utf8'));
+  //   io.emit('data', { data: data.toString('utf8') });
+  // })
+  // serport.on('close', function () {
+  //   console.log("port closed");
+  //   io.emit('close');
+  // })
 });

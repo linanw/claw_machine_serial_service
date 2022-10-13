@@ -23,3 +23,14 @@ here are some web services which are exposed to (video SDK) within serial_port_w
     - drop the toy
     - stop music?
   
+
+  need to install node on a fresh machine
+  node12?
+
+sudo apt update
+sudo apt -y upgrade
+sudo apt update
+sudo apt -y install curl dirmngr apt-transport-https lsb-release ca-certificates
+curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+sudo apt -y install nodejs
+sudo apt -y install gcc g++ make
