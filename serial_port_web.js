@@ -81,7 +81,7 @@ app.get('/catch', function (req, res) {
   SerialPort.write("[$J=G91 G21 Z+200 F1000]");
   
   //close claw
-  SerialPort.write("[M8]");
+  SerialPort.write("M8");
 
   //move up claw
   SerialPort.write("[$J=G91 G21 Z+200 F1000]");
@@ -93,7 +93,7 @@ app.get('/catch', function (req, res) {
   SerialPort.write("[$J=G91 G21 Y-1000 F800]");
 
   //open claw
-  SerialPort.write("[M9]");
+  SerialPort.write("M9");
   res.end();
 });
 
