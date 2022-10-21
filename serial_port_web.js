@@ -7,7 +7,11 @@ var serport = "";
 var rate = 115200;
 var serports = [];
 var fs = require('fs');
+const { syncBuiltinESMExports } = require('module');
+const { send } = require('process');
 const { SerialPort } = require('serialport');
+var Sound = require('node-aplay');
+var music = new Sound("claw.wav");
 
 var express = require('express'),
   app = express(),
@@ -41,61 +45,94 @@ app.get('/close', function (req, res) {
   res.end();
 });
 
+app.get('/stop', function (req, res) {
+  //TODO: to be implemented
+  console.log("stop");
+  serport.write("!");
+  res.end();
+});
+
 app.get('/up', function (req, res) {
   //TODO: to be implemented
   console.log("up");
-  SerialPort.write("[$J=G91 G21 Y-100 F800]");
+  sendGrblCmd("$J=G91 G21 Y10 F8000");
   res.end();
 });
 app.get('/down', function (req, res) {
   //TODO: to be implemented
   console.log("down");
-  SerialPort.write("[$J=G91 G21 Y+100 F800]");
+  sendGrblCmd("$J=G91 G21 Y-10 F8000");
   res.end();
 });
 app.get('/left', function (req, res) {
   //TODO: to be implemented
   console.log("left");
-  SerialPort.write("[$J=G91 G21 X-100 F800]");
+  sendGrblCmd("$J=G91 G21 X-10 F8000");
   res.end();
 });
 app.get('/right', function (req, res) {
   //TODO: to be implemented
   console.log("right");
-  SerialPort.write("[$J=G91 G21 X+100 F800]");
+  sendGrblCmd("$J=G91 G21 X+10 F8000");
   res.end();
 });
 app.get('/start', function (req, res) {
   //TODO: to be implemented
+  try{
+    music.stop();
+  }
+  catch(ex)
+  {
+    console.log(ex.message);
+  }
+  music.play();
+  sendGrblCmd("$H");
+  sendGrblCmd("$J=G91 G21 X200 Y100 F8000")
   console.log("start");
   res.end();
 });
-app.get('/catch', function (req, res) {
+app.get('/catch', async function (req, res) {
   //TODO: to be implemented
+  sendGrblCmd("$J=G91 G21 Z-175 F8000");
+  await sleep(3000);
+  sendGrblCmd("M8");
+  sendGrblCmd("$H");
+  sendGrblCmd("M11");
   console.log("catch");
 
 
 
 
   //drop down claw
-  SerialPort.write("[$J=G91 G21 Z+200 F1000]");
+ // SerialPort.write("[$J=G91 G21 Z+200 F1000]");
   
   //close claw
-  SerialPort.write("M8");
+  //SerialPort.write("M8");
 
   //move up claw
-  SerialPort.write("[$J=G91 G21 Z+200 F1000]");
+//  SerialPort.write("[$J=G91 G21 Z+200 F1000]");
 
   //goto origin left
-  SerialPort.write("[$J=G91 G21 X-1000 F800]");
+  //SerialPort.write("[$J=G91 G21 X-1000 F800]");
 
   //goto origin down
-  SerialPort.write("[$J=G91 G21 Y-1000 F800]");
+  //SerialPort.write("[$J=G91 G21 Y-1000 F800]");
 
   //open claw
-  SerialPort.write("M9");
+  //SerialPort.write("M9");
   res.end();
 });
+
+const sleep = (ms) =>
+{
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+const sendGrblCmd = (cmd) =>{
+  // serport.write("$X\n");
+  serport.write(cmd + "\n");
+}
 
 io.on('connection', onConnection);
 
@@ -125,22 +162,28 @@ SerialPort.list().then(ports => {
     console.log("No serial ports found!");
     //dreamtcs to uncomment this in production
     
-    //process.exit();
+    process.exit();
   }
   //dreamtcs to uncomment this in production
 
-  // serport = new SerialPort({
-  //   path: serports[0], baudRate: rate, autoOpen: false,
-  // })
-  // serport.on('error', function (err) {
-  //   console.log('Error: ', err.message)
-  // })
-  // serport.on('data', function (data) {
-  //   console.log(data.toString('utf8'));
-  //   io.emit('data', { data: data.toString('utf8') });
-  // })
-  // serport.on('close', function () {
-  //   console.log("port closed");
-  //   io.emit('close');
-  // })
+  serport = new SerialPort({
+    path: serports[0], baudRate: rate, autoOpen: true,
+  })
+  serport.on('open', async function(){
+    console.log("port opened");
+    await sleep(1000)
+    sendGrblCmd("$X"); // unlock motor
+    sendGrblCmd("M7"); // turn LED light on
+  })
+  serport.on('error', function (err) {
+    console.log('Error: ', err.message)
+  })
+  serport.on('data', function (data) {
+    console.log(data.toString('utf8'));
+    io.emit('data', { data: data.toString('utf8') });
+  })
+  serport.on('close', function () {
+    console.log("port closed");
+    io.emit('close');
+  })
 });
