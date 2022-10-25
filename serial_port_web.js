@@ -8,10 +8,37 @@ var rate = 115200;
 var serports = [];
 var fs = require('fs');
 const { syncBuiltinESMExports } = require('module');
-const { send } = require('process');
+const { send, stdout } = require('process');
 const { SerialPort } = require('serialport');
-var Sound = require('node-aplay');
-var music = new Sound("claw.wav");
+const { spawn } = require("child_process");
+var music_player;
+
+const startMusic = () => {
+  music_player = spawn("aplay", ["--device","plughw:CARD=Device,DEV=0","/home/zoomda/claw.wav"], {
+    detached: true,
+    stdin: 'ignore'
+  })
+  music_player.stdout.on('data', (data)=>{
+    console.log(`stdout: ${data}`);
+    return;
+  });
+  music_player.stderr.on('data', (data)=>{
+      console.log(`stderr: ${data}`);
+      return;
+  });
+};
+
+const stopMusic = () => {
+  if(music_player)music_player.kill();
+};
+
+const cleanAPlay = () => {
+  const kill_all_aplay = spawn('killall aplay');
+  kill_all_aplay.on('error', (data) => {
+    console.log(`error: ${data}`);
+  });
+  console.log('killall aplay');
+};
 
 var express = require('express'),
   app = express(),
@@ -19,9 +46,11 @@ var express = require('express'),
   io = require('socket.io')(server),
   port = 8888;
 
-server.listen(port, () => console.log('Server Listening on port' + port))
+process.on('exit', ()=>{
+  console.log('process exit')
+});
 
-//app.use(express.static(__dirname));
+server.listen(port, () => console.log('Server Listening on port' + port))
 
 app.get('/', function (req, res) {
   fs.readFile(__dirname + '/index.html', 'utf8', function (err, data) {
@@ -76,50 +105,24 @@ app.get('/right', function (req, res) {
   sendGrblCmd("$J=G91 G21 X+10 F8000");
   res.end();
 });
-app.get('/start', function (req, res) {
-  //TODO: to be implemented
-  try{
-    music.stop();
-  }
-  catch(ex)
-  {
-    console.log(ex.message);
-  }
-  music.play();
+app.get('/start', async function (req, res) {
+  sendGrblCmd("M11");
+  sendGrblCmd("M7");
+  startMusic();
   sendGrblCmd("$H");
   sendGrblCmd("$J=G91 G21 X200 Y100 F8000")
   console.log("start");
   res.end();
 });
 app.get('/catch', async function (req, res) {
-  //TODO: to be implemented
+  console.log("catch...");
   sendGrblCmd("$J=G91 G21 Z-175 F8000");
   await sleep(3000);
   sendGrblCmd("M8");
   sendGrblCmd("$H");
   sendGrblCmd("M11");
-  console.log("catch");
-
-
-
-
-  //drop down claw
- // SerialPort.write("[$J=G91 G21 Z+200 F1000]");
-  
-  //close claw
-  //SerialPort.write("M8");
-
-  //move up claw
-//  SerialPort.write("[$J=G91 G21 Z+200 F1000]");
-
-  //goto origin left
-  //SerialPort.write("[$J=G91 G21 X-1000 F800]");
-
-  //goto origin down
-  //SerialPort.write("[$J=G91 G21 Y-1000 F800]");
-
-  //open claw
-  //SerialPort.write("M9");
+  await sleep(8000);
+  stopMusic();
   res.end();
 });
 
