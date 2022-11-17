@@ -1,0 +1,14 @@
+[Unit]
+Description=Web server to connect serial port. 
+Documentation=
+After=network.target
+
+[Service]
+Environment=
+Type=simple
+User=zoomda
+ExecStart=/usr/bin/node /home/zoomda/GitHub/claw_machine_serial/index.js
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
