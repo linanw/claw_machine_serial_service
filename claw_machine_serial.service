@@ -7,7 +7,7 @@ After=network.target
 Environment=
 Type=simple
 User=zoomda
-ExecStart=/usr/bin/node /home/zoomda/GitHub/claw_machine_serial/index.js
+ExecStart=/usr/bin/node /home/zoomda/GitHub/claw_machine_serial_service/index.js
 Restart=on-failure
 
 [Install]
