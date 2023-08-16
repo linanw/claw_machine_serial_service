@@ -1,3 +1,5 @@
+this is a branch for small toy claw machine which is controlled from an arduino uno
+
 this is a nodejs application which listens for commands from
 video SDK project
 
