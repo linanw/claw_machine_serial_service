@@ -1,4 +1,4 @@
-const rate = 115200;
+const rate = 9600;
 const x_max = 260
 const y_max = 150
 const z_max = 210;
@@ -88,22 +88,22 @@ app.get('/stop', function (req, res) {
 });
 app.get('/up', async (req, res) => {
   console.log("up");
-  await sendGrblCmd("$J=G91 G21 Y10 F8000");
+    serport.write("up");
   res.end();
 });
 app.get('/down', async (req, res) => {
   console.log("down");
-  await sendGrblCmd("$J=G91 G21 Y-10 F8000");
+   serport.write("down");
   res.end();
 });
 app.get('/left', async (req, res) => {
   console.log("left");
-  await sendGrblCmd("$J=G91 G21 X-10 F8000");
+  serport.write("left");
   res.end();
 });
 app.get('/right', async (req, res) => {
   console.log("right");
-  await sendGrblCmd("$J=G91 G21 X+10 F8000");
+  serport.write("right");
   res.end();
 });
 app.get('/lighton', async (req, res) => {
@@ -124,20 +124,23 @@ app.get('/clawClose', async (req, res) => {
 });
 app.get('/start', async (req, res) => {
   console.log("start");
-  await clawOpen();
-  await lightOn();
+
+  //await clawOpen();
+  //await lightOn();
   startMusic();
-  await home()
-  await center();
+  serport.write("start");
+  //await home()
+  //await center();
   res.end();
 });
 app.get('/catch', async function (req, res) {
   console.log("catch...");
-  await clawDown();
-  await clawClose();
-  await home();
-  await clawOpen();
-  // stopMusic();
+  serport.write("catch");
+  //await clawDown();
+  //await clawClose();
+  //await home();
+  //await clawOpen();
+  stopMusic();
   res.end();
 });
 
@@ -246,9 +249,9 @@ SerialPort.list().then(ports => {
   });
   serport.on('open', async function () {
     console.log("port opened");
-    await sleep(1000)
-    await sendGrblCmd("$X"); // unlock motor
-    lightOn();
+    //await sleep(1000)
+    //await sendGrblCmd("$X"); // unlock motor
+    //lightOn();
   });
   serport.on('error', function (err) {
     console.log('Error: ', err.message)
