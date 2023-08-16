@@ -1,5 +1,8 @@
 this is a branch for small toy claw machine which is controlled from an arduino uno
 
+to select the sound devices, use `aplay --list-pcms` and change the string "plughw.......DEV=0" accordingly in index.js
+music_player = spawn("aplay", ["--device", "plughw:CARD=Device,DEV=0", music_file]
+
 this is a nodejs application which listens for commands from
 video SDK project
 
