@@ -1,1 +1,3 @@
 node_modules/
+/.vs
+/claw_machine_serial.service
